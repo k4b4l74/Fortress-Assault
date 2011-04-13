@@ -1,6 +1,6 @@
 name: FortressAssault
 main: ssell.FortressAssault.FortressAssault
-version: "1.2.3"
+version: "1.2.4"
 commands:
     faStart:
         description: Starts the event.

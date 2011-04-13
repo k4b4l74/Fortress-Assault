@@ -3,6 +3,7 @@ package ssell.FortressAssault;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.block.Block;
 import org.bukkit.craftbukkit.CraftWorld;
 import org.bukkit.craftbukkit.entity.CraftPlayer;
 import org.bukkit.entity.Item;
@@ -24,10 +25,12 @@ public class FAPlayerListener
 	extends PlayerListener
 {
 	private final FortressAssault plugin;
+	private final FARespawnHandler respawnHandler;
 	
-	public FAPlayerListener( FortressAssault instance, FAEntityListener entity )
+	public FAPlayerListener( FortressAssault instance, FAEntityListener entity, FARespawnHandler respawn )
 	{
 		plugin = instance;
+		respawnHandler = respawn;
 	}
 	public void onPlayerMove(PlayerMoveEvent event) {
 		Player player = event.getPlayer( );
@@ -146,7 +149,7 @@ public class FAPlayerListener
 			{
 					delayedCheck( finalEvent );
 			}
-		}, 20 );
+		}, 400 );
 		
 	}
 	
@@ -164,6 +167,12 @@ public class FAPlayerListener
 
 		if (plugin.phase != 0) {
 			plugin.giveGameItems(player);
+			//Find the spawn block of the player
+			Block block = respawnHandler.getRespawnBlockFromPlayer(thisPlayer);
+			if (block != null) {
+				Location spawnLocation = new Location(thisPlayer.world, block.getX(), block.getY()+1, block.getZ());
+				thisPlayer.player.teleport(spawnLocation);
+			}
 		}
 		
 	}

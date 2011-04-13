@@ -4,6 +4,7 @@ import org.bukkit.Material;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.entity.EntityDamageByProjectileEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.EntityListener;
@@ -55,8 +56,12 @@ public class FAEntityListener
 					event.setCancelled( true );
 					return;
 				}
-				else if( plugin.phase == 2 )
-				{					
+				else if( plugin.phase == 2 ) {
+					
+					if(event instanceof EntityDamageByProjectileEvent && event.getDamage() >= 1){
+		        		event.setDamage(event.getDamage() * 2);
+		        	}
+		        	
 					int damage = event.getDamage();
 					int oldHealth = player.getHealth( );
 					int newHealth = oldHealth - damage;
@@ -81,6 +86,7 @@ public class FAEntityListener
 						//drop a cookie
 						player.getWorld().dropItem(player.getLocation(),new ItemStack( Material.COOKIE, 1 ));
 						
+
 					}
 
 					if( event instanceof EntityDamageByEntityEvent )

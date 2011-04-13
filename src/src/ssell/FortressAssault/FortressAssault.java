@@ -91,11 +91,12 @@ public class FortressAssault extends JavaPlugin
 	
 	//The order of these is critical
 	private final FAGizmoHandler gizmoHandler = new FAGizmoHandler( this, 2 );
-	private final FABlockListener blockListener = new FABlockListener( this, gizmoHandler );
+	private final FARespawnHandler respawnHandler = new FARespawnHandler(this);
+	private final FABlockListener blockListener = new FABlockListener( this, gizmoHandler, respawnHandler);
 	private final FAPvPWatcher pvpWatcher = new FAPvPWatcher( this );
 	private final FAClassAbilities classAbilities = new FAClassAbilities( this );
 	private final FAEntityListener entityListener = new FAEntityListener( this );
-	private final FAPlayerListener playerListener = new FAPlayerListener( this, entityListener );
+	private final FAPlayerListener playerListener = new FAPlayerListener( this, entityListener, respawnHandler);
 	
 	private int resources = 2;			//Default resource level (normal)
 	private int timeLimit = 1;			//Default time limit to build
@@ -574,7 +575,8 @@ public class FortressAssault extends JavaPlugin
 	public void stopGame() {
 		phase = 0;
 		
-		gizmoHandler.clearList( );			
+		gizmoHandler.clearList( );
+		respawnHandler.clearList( );
 		giveGameItems();
 		restorePlayerInventory();
 	}
@@ -744,6 +746,8 @@ public class FortressAssault extends JavaPlugin
 			break;
 		//fortify phase
 		case 1:
+			//Add max life to everybody
+			player.setHealth(20);
 			player.getInventory( ).clear( );
 			
 			if (thisPlayer.team == Team.BLUE || thisPlayer.team == Team.ZOMBIE) {
@@ -751,21 +755,21 @@ public class FortressAssault extends JavaPlugin
 				player.getInventory( ).setChestplate( new ItemStack( Material.CHAINMAIL_CHESTPLATE, 1 ) );
 				player.getInventory( ).setLeggings( new ItemStack( Material.CHAINMAIL_LEGGINGS, 1 ) );
 				player.getInventory( ).setBoots( new ItemStack( Material.CHAINMAIL_BOOTS, 1 ) );
+				//Add blue ore block for setting player BLUE respawn point
+				player.getInventory( ).addItem( new ItemStack ( Material.LAPIS_ORE, 1) );
 			} else {
 				player.getInventory( ).setHelmet( new ItemStack( Material.GOLD_HELMET, 1 ) );
 				player.getInventory( ).setChestplate( new ItemStack( Material.GOLD_CHESTPLATE, 1 ) );
 				player.getInventory( ).setLeggings( new ItemStack( Material.GOLD_LEGGINGS, 1 ) );
-				player.getInventory( ).setBoots( new ItemStack( Material.GOLD_BOOTS, 1 ) );				
+				player.getInventory( ).setBoots( new ItemStack( Material.GOLD_BOOTS, 1 ) );
+				//Add red ore block for setting player RED respawn point
+				player.getInventory( ).addItem( new ItemStack ( Material.REDSTONE_ORE, 1) );
 			}
 		
 			player.getInventory( ).addItem( new ItemStack( Material.OBSIDIAN, 1 ) );
 			player.getInventory( ).addItem( new ItemStack( Material.IRON_PICKAXE, 1 ) );
-			player.getInventory( ).addItem( new ItemStack( Material.IRON_AXE, 1 ) );
-			player.getInventory( ).addItem( new ItemStack( Material.IRON_SPADE, 1 ) );
-			player.getInventory( ).addItem( new ItemStack( Material.STONE, ( resources * 64 ) ) );
-			player.getInventory( ).addItem( new ItemStack( Material.COBBLESTONE, ( resources * 3 * 64 ) ) );
-			player.getInventory( ).addItem( new ItemStack( Material.WOOD, ( int )( resources * 0.5 * 64 ) ) );
-			player.getInventory( ).addItem( new ItemStack( Material.TORCH, 64 ) );
+			player.getInventory( ).addItem( new ItemStack( Material.STONE, ( resources * 32 ) ) );
+			
 			break;
 		//attack phase
 		case 2:
@@ -780,12 +784,18 @@ public class FortressAssault extends JavaPlugin
 				player.getInventory( ).setHelmet( new ItemStack( Material.GOLD_HELMET, 1 ) );
 				player.getInventory( ).setChestplate( new ItemStack( Material.GOLD_CHESTPLATE, 1 ) );
 				player.getInventory( ).setLeggings( new ItemStack( Material.GOLD_LEGGINGS, 1 ) );
-				player.getInventory( ).setBoots( new ItemStack( Material.GOLD_BOOTS, 1 ) );				
+				player.getInventory( ).setBoots( new ItemStack( Material.GOLD_BOOTS, 1 ) );		
 			}
 			
-			player.getInventory( ).addItem( new ItemStack( Material.IRON_SWORD, 1 ) );
+			// Stone Sword instead of Iron
+			player.getInventory( ).addItem( new ItemStack( Material.STONE_SWORD, 1 ) );
 			player.getInventory( ).addItem( new ItemStack( Material.STONE_PICKAXE, 1 ) );
-			player.getInventory( ).addItem( new ItemStack( Material.TNT, 3 ) );
+			
+
+			player.getInventory( ).addItem( new ItemStack( Material.TNT, 1 ) );
+			// Add bow + arrow
+			player.getInventory( ).addItem( new ItemStack( Material.BOW, 1 ) );
+			player.getInventory( ).addItem( new ItemStack( Material.ARROW, 10 ) );
 			player.getInventory( ).addItem( new ItemStack( Material.LADDER, 6 ) );
 			player.getInventory( ).addItem( new ItemStack( Material.MUSHROOM_SOUP, 1 ) );
 			player.getInventory( ).addItem( new ItemStack( Material.COOKED_FISH, 1 ) );

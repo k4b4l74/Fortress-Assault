@@ -30,6 +30,7 @@ import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.PluginManager;
+import org.bukkit.util.Vector;
 
 import com.nijikokun.bukkit.Permissions.Permissions;
 
@@ -110,6 +111,12 @@ public class FortressAssault extends JavaPlugin
 	private Volume volume;
 	private boolean mapsaved = false;
 	
+
+	private boolean friendlyFire = true; //default friendly fire state
+	private Vector playerDefaultSpeed = null; //default player speed (not initialized)
+	private Float  speedMultiplier = (float) 1; //default speed multiplier
+	public static double lastSnareEvent = 0; //last snare avent (not initialized)
+	
 	public List< FAPlayer > playerList = new ArrayList< FAPlayer >( );
 	private HashMap<String, InventoryStash> inventories = new HashMap<String, InventoryStash>();
 	
@@ -181,6 +188,15 @@ public class FortressAssault extends JavaPlugin
 		String[] split = args;
 		String commandName = command.getName().toLowerCase();
 		Player player = ( Player )sender;
+		
+		//LLY
+		//TODO: pas tres propre mais je ne sais pas comment initialiser a la valeur
+		//par defaut de minecraft sans avoir le Player
+		if(null == playerDefaultSpeed)
+		{
+			playerDefaultSpeed = player.getVelocity();
+		}
+		
 	    if (canPlayFA(player) == false) {
 	    	player.sendMessage(ChatColor.RED + "You don't have permission to play Fortress Assault.");
 	    } else {
@@ -327,6 +343,33 @@ public class FortressAssault extends JavaPlugin
 						player.sendMessage(ChatColor.RED + "You don't have permission to change classes.");
 					}
 									
+				}
+				//Change friendly fire
+				else if( commandName.equalsIgnoreCase( "faff" )	)
+				{
+					if (canStart(player))
+						friendlyFire = args[0].equalsIgnoreCase("on");
+					else
+						player.sendMessage(ChatColor.RED + "You don't have permission to change friendly fire.");
+				}
+				//Change speed
+				else if(commandName.equalsIgnoreCase( "faspeed" ))
+				{
+					if (canStart(player))
+					{
+						float f = 1;
+						try
+					    {
+					      f = Float.valueOf(args[0].trim()).floatValue();
+					    }
+					    catch (NumberFormatException nfe)
+					    {
+					    	player.sendMessage(ChatColor.RED + "Please enter a float number (example: 1.2 , 2 or 0.5)");
+					    }
+						speedMultiplier = f; 
+						changePlayersSpeed();
+					}else
+						player.sendMessage(ChatColor.RED + "You don't have permission to change speed.");
 				}
 	
 				
@@ -1144,4 +1187,27 @@ public class FortressAssault extends JavaPlugin
 		}
 		return false;
 	}
+	
+	
+	public boolean getFriendlyFire(){
+		return friendlyFire;
+	}
+	
+	public Vector getPlayersSpeed(){
+		return playerDefaultSpeed.multiply(speedMultiplier);
+	}
+	
+	public Vector getDefaultSpeed(){
+		return playerDefaultSpeed;
+	}
+	
+	
+	public void changePlayersSpeed(){
+		for(FAPlayer faPlayer : playerList)
+		{
+			Vector newSpeed	=	playerDefaultSpeed.multiply(speedMultiplier);
+			faPlayer.player.setVelocity(newSpeed);
+		}
+	}
+	
 }

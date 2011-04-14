@@ -1,6 +1,8 @@
 package ssell.FortressAssault;
 
+import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.entity.Arrow;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDamageByBlockEvent;
@@ -10,6 +12,7 @@ import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.EntityListener;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.util.Vector;
 
 import ssell.FortressAssault.FortressAssault;
 import ssell.FortressAssault.FAPvPWatcher;
@@ -115,6 +118,56 @@ public class FAEntityListener
 						
 
 					}
+					
+					//LLY
+					//trigger on damage from projectile (as arrow)
+					if( event instanceof EntityDamageByProjectileEvent )
+					{
+						EntityDamageByProjectileEvent damageEvent = ( EntityDamageByProjectileEvent  )event;
+						
+						//if damager is a player AND projectile is an arrow
+						if(damageEvent.getDamager( ) instanceof Player && 
+								damageEvent.getProjectile() instanceof Arrow)
+						{
+							Player attacker = ( Player )damageEvent.getDamager( );
+					
+							//FIRE
+							if(attacker.getInventory().contains(Material.LAVA_BUCKET ) || 
+									attacker.getInventory().contains(Material.LAVA))
+							{
+								
+								player.setFireTicks(60);
+								
+								if(attacker.getInventory().contains(Material.LAVA_BUCKET ))
+									attacker.getInventory().remove(Material.LAVA_BUCKET);
+								else
+									attacker.getInventory().remove(Material.LAVA);
+							}
+							//SNARE
+							else if(attacker.getInventory().contains(Material.ICE))
+							{
+								attacker.getInventory().remove(Material.ICE);
+								Vector speed = player.getVelocity();
+								if(speed == plugin.getPlayersSpeed())
+								{
+									Vector newspeed = speed.multiply(0.5);
+									player.setVelocity(newspeed);
+								}
+							}
+							//GRAB
+							else if(attacker.getInventory().contains(Material.YELLOW_FLOWER))
+							{
+								attacker.getInventory().remove(Material.YELLOW_FLOWER);
+								Location attackerLoc = attacker.getLocation();
+								//prevent fusion :)
+								attackerLoc.setX(attackerLoc.getX()+2);
+								player.teleport(attackerLoc);
+								FortressAssault.lastSnareEvent = System.currentTimeMillis();
+							}
+						}
+						
+					}
+					
 
 					if( event instanceof EntityDamageByEntityEvent )
 					{

@@ -79,6 +79,17 @@ public class FAPlayerListener
 			//event.setCancelled(true);
 			 */
 		}
+		
+		//LLy
+		//player is snared , lets check for how long
+		if(!player.getVelocity().equals(plugin.getPlayersSpeed()))
+		{
+			//reset player speed if snared for more than 2sec
+			if(System.currentTimeMillis() > (FortressAssault.lastSnareEvent+2000))
+			{
+				player.setVelocity(plugin.getPlayersSpeed());
+			}
+		}
 	}
 	public void onPlayerDropItem(PlayerDropItemEvent event) {
 		Player player = event.getPlayer( );

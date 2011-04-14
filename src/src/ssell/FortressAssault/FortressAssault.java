@@ -832,8 +832,8 @@ public class FortressAssault extends JavaPlugin
 			player.getInventory( ).addItem( new ItemStack( Material.IRON_PICKAXE, 1 ) );
 			
 
-			player.getInventory( ).addItem( new ItemStack( Material.EGG, resources * 1 ) );
-			player.getInventory( ).addItem( new ItemStack( Material.SNOW_BALL, resources * 1));
+			player.getInventory( ).addItem( new ItemStack( Material.EGG, resources * 2 ) );
+			//player.getInventory( ).addItem( new ItemStack( Material.SNOW_BALL, resources * 1));
 			player.getInventory( ).addItem( new ItemStack( Material.BOW, 1 ) );
 			player.getInventory( ).addItem( new ItemStack( Material.ARROW, resources * 5 ) );
 			player.getInventory( ).addItem( new ItemStack( Material.LADDER, 6 ) );

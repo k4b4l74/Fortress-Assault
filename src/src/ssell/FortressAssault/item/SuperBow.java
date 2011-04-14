@@ -70,7 +70,7 @@ public class SuperBow {
 
 					}
 				}*/
-				event.setDamage(0);
+				event.setDamage(3);
 				player.setFireTicks(dmgFireDelaySeconds * 20);
 			}
 		}

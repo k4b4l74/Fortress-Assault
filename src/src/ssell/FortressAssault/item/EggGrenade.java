@@ -21,7 +21,7 @@ public class EggGrenade {
 	//Delai of explosion
 	private int secondDelay = 1;
 	//Yield
-	private float yield = (float) 2.0;
+	private float yield = (float) 1.5;
 	
 	private static EggGrenade instance = null;
 	
@@ -40,7 +40,7 @@ public class EggGrenade {
 		if (event instanceof EntityDamageByBlockEvent) {
 			EntityDamageByBlockEvent damageEvent = (EntityDamageByBlockEvent) event;
 			if (damageEvent.getDamager().getType() == Material.TNT) {
-				event.setDamage(10);
+				event.setDamage(1);
 			}
 		}
 	}

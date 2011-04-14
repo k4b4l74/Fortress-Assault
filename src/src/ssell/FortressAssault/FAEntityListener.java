@@ -14,6 +14,7 @@ import ssell.FortressAssault.FAPvPWatcher;
 import ssell.FortressAssault.FortressAssault.ClassType;
 import ssell.FortressAssault.FortressAssault.FAPlayer;
 import ssell.FortressAssault.item.EggGrenade;
+import ssell.FortressAssault.item.PickAxe;
 import ssell.FortressAssault.item.SnowBallSnare;
 import ssell.FortressAssault.item.SuperBow;
 
@@ -69,6 +70,9 @@ public class FAEntityListener
 					
 					//BOW DMG MODIFIER
 					SuperBow.getInstance().onEntityDamage(event, player);
+					
+					//PICKAXE DMG MODIFIER
+					PickAxe.getInstance().onEntityDamage(event);
 					
 					//NO DMG IF PLAYER IS AN OBSERVER
 					if( event instanceof EntityDamageByEntityEvent ) {

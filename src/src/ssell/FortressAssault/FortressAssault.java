@@ -619,6 +619,7 @@ public class FortressAssault extends JavaPlugin
 		giveGameItems();
 		restorePlayerInventory();
 		specHandler.clearObservers();
+		//playerList = new ArrayList<FortressAssault.FAPlayer>();
 	}
 	
 	/**
@@ -791,17 +792,17 @@ public class FortressAssault extends JavaPlugin
 			player.getInventory( ).clear( );
 			
 			if (thisPlayer.team == Team.BLUE || thisPlayer.team == Team.ZOMBIE) {
-				player.getInventory( ).setHelmet( new ItemStack( Material.CHAINMAIL_HELMET, 1 ) );
-				player.getInventory( ).setChestplate( new ItemStack( Material.CHAINMAIL_CHESTPLATE, 1 ) );
-				player.getInventory( ).setLeggings( new ItemStack( Material.CHAINMAIL_LEGGINGS, 1 ) );
-				player.getInventory( ).setBoots( new ItemStack( Material.CHAINMAIL_BOOTS, 1 ) );
+				//player.getInventory( ).setHelmet( new ItemStack( Material.CHAINMAIL_HELMET, 1 ) );
+				//player.getInventory( ).setChestplate( new ItemStack( Material.CHAINMAIL_CHESTPLATE, 1 ) );
+				//player.getInventory( ).setLeggings( new ItemStack( Material.CHAINMAIL_LEGGINGS, 1 ) );
+				//player.getInventory( ).setBoots( new ItemStack( Material.CHAINMAIL_BOOTS, 1 ) );
 				//Add blue ore block for setting player BLUE respawn point
 				player.getInventory( ).addItem( new ItemStack ( Material.LAPIS_ORE, 1) );
 			} else {
-				player.getInventory( ).setHelmet( new ItemStack( Material.GOLD_HELMET, 1 ) );
-				player.getInventory( ).setChestplate( new ItemStack( Material.GOLD_CHESTPLATE, 1 ) );
-				player.getInventory( ).setLeggings( new ItemStack( Material.GOLD_LEGGINGS, 1 ) );
-				player.getInventory( ).setBoots( new ItemStack( Material.GOLD_BOOTS, 1 ) );
+				//player.getInventory( ).setHelmet( new ItemStack( Material.GOLD_HELMET, 1 ) );
+				//player.getInventory( ).setChestplate( new ItemStack( Material.GOLD_CHESTPLATE, 1 ) );
+				//player.getInventory( ).setLeggings( new ItemStack( Material.GOLD_LEGGINGS, 1 ) );
+				//player.getInventory( ).setBoots( new ItemStack( Material.GOLD_BOOTS, 1 ) );
 				//Add red ore block for setting player RED respawn point
 				player.getInventory( ).addItem( new ItemStack ( Material.REDSTONE_ORE, 1) );
 			}
@@ -815,6 +816,7 @@ public class FortressAssault extends JavaPlugin
 		case 2:
 			player.getInventory( ).clear( );
 			
+			/*
 			if (thisPlayer.team == Team.BLUE || thisPlayer.team == Team.ZOMBIE) {
 				player.getInventory( ).setHelmet( new ItemStack( Material.CHAINMAIL_HELMET, 1 ) );
 				player.getInventory( ).setChestplate( new ItemStack( Material.CHAINMAIL_CHESTPLATE, 1 ) );
@@ -825,15 +827,15 @@ public class FortressAssault extends JavaPlugin
 				player.getInventory( ).setChestplate( new ItemStack( Material.GOLD_CHESTPLATE, 1 ) );
 				player.getInventory( ).setLeggings( new ItemStack( Material.GOLD_LEGGINGS, 1 ) );
 				player.getInventory( ).setBoots( new ItemStack( Material.GOLD_BOOTS, 1 ) );		
-			}
+			}*/
 			
 			// Stone Sword instead of Iron
-			player.getInventory( ).addItem( new ItemStack( Material.STONE_SWORD, 1 ) );
+			player.getInventory( ).addItem( new ItemStack( Material.WOOD_SWORD, 1 ) );
 			player.getInventory( ).addItem( new ItemStack( Material.IRON_PICKAXE, 1 ) );
 			
 
 			player.getInventory( ).addItem( new ItemStack( Material.EGG, resources * 2 ) );
-			//player.getInventory( ).addItem( new ItemStack( Material.SNOW_BALL, resources * 1));
+			player.getInventory( ).addItem( new ItemStack( Material.SNOW_BALL, resources * 4));
 			player.getInventory( ).addItem( new ItemStack( Material.BOW, 1 ) );
 			player.getInventory( ).addItem( new ItemStack( Material.ARROW, resources * 5 ) );
 			player.getInventory( ).addItem( new ItemStack( Material.LADDER, 6 ) );

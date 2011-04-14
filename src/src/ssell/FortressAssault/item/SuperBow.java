@@ -9,7 +9,7 @@ public class SuperBow {
 
 	private static SuperBow instance = null;
 	//private int dmgMultiplier = 2;
-	private int dmgFireDelaySeconds = 3;
+	private int dmgFireDelaySeconds = 4;
 
 	public SuperBow() {
 	}
@@ -70,7 +70,7 @@ public class SuperBow {
 
 					}
 				}*/
-				event.setDamage(3);
+				event.setDamage(2);
 				player.setFireTicks(dmgFireDelaySeconds * 20);
 			}
 		}

@@ -35,7 +35,7 @@ public class SnowBallSnare {
 	 * @param event
 	 */
 	public void onPlayerMove(PlayerMoveEvent event) {
-		checkForRemovingSnare(event.getPlayer());
+		checkSnare(event.getPlayer());
 	}
 	
 	/**
@@ -60,7 +60,7 @@ public class SnowBallSnare {
 		player.setVelocity(slowVelocity);
 	}
 	
-	private void checkForRemovingSnare(Player player) {
+	private void checkSnare(Player player) {
 		if (playersSnare.containsKey(player.getName())) {
 			long now = System.currentTimeMillis();
 			long initialSnare = playersSnare.get(player.getName()).longValue();
@@ -70,6 +70,10 @@ public class SnowBallSnare {
 				playersSnare.remove(player.getName());
 				Vector normalVelocity = player.getVelocity().multiply(1 / defaultSnaring);
 				player.setVelocity(normalVelocity);
+			} else {
+				//Snare again
+				Vector slowVelocity = player.getVelocity().multiply(defaultSnaring);
+				player.setVelocity(slowVelocity);
 			}
 		}
 		

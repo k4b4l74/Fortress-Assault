@@ -30,11 +30,13 @@ public class FAPlayerListener
 {
 	private final FortressAssault plugin;
 	private final FARespawnHandler respawnHandler;
+	private final FASpecHandler specHandler;
 	
-	public FAPlayerListener( FortressAssault instance, FAEntityListener entity, FARespawnHandler respawn )
+	public FAPlayerListener( FortressAssault instance, FAEntityListener entity, FARespawnHandler respawn, FASpecHandler spec)
 	{
 		plugin = instance;
 		respawnHandler = respawn;
+		specHandler = spec;
 	}
 	
 	@Override
@@ -192,6 +194,9 @@ public class FAPlayerListener
 		thisPlayer.dead = false;
 		player = plugin.getServer().getPlayer(ChatColor.stripColor(player.getDisplayName()));
 
+		//Remove player from observer list
+		specHandler.removeObserver(player);
+		
 		if (plugin.phase != 0) {
 			plugin.giveGameItems(player);
 			//Find the spawn block of the player
@@ -212,14 +217,16 @@ public class FAPlayerListener
 		if (thisPlayer == null) {
 			return;
 		}
-		thisPlayer.dead = false;
-		player = plugin.getServer().getPlayer(ChatColor.stripColor(player.getDisplayName()));
 
+		player = plugin.getServer().getPlayer(ChatColor.stripColor(player.getDisplayName()));
+		//Add player to observer list
+		specHandler.addObserver(player);
+		
 		if (plugin.phase != 0) {
 			//Find the spawn block of the player
 			Block block = respawnHandler.getRespawnBlockFromPlayer(thisPlayer);
 			if (block != null) {
-				Location specLocation = plugin.getSpecLocation();
+				Location specLocation = specHandler.getLocation();
 				thisPlayer.player.teleport(specLocation);
 			}
 		}

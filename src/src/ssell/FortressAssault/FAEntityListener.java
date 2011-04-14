@@ -8,7 +8,6 @@ import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageByProjectileEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
-import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.event.entity.EntityListener;
 import org.bukkit.inventory.ItemStack;
 
@@ -24,13 +23,15 @@ public class FAEntityListener
 {
 	private final FortressAssault plugin;
 	private final FAPvPWatcher pvpWatcher;
+	private final FASpecHandler specHandler;
 		
 	//--------------------------------------------------------------------------------------
 	
-	public FAEntityListener( FortressAssault instance )
+	public FAEntityListener( FortressAssault instance, FASpecHandler aSpecHandler)
 	{
 		plugin = instance;
 		pvpWatcher = instance.getWatcher( );
+		specHandler = aSpecHandler;
 	}
 	
 	/**
@@ -71,7 +72,7 @@ public class FAEntityListener
 		        		event.setDamage(event.getDamage() * 2);
 		        	}
 					
-					//NO DMG IF PLAYER SPEC WITH 0 INVENTORY
+					//NO DMG IF PLAYER IS AN OBSERVER
 					if( event instanceof EntityDamageByEntityEvent ) {
 						EntityDamageByEntityEvent damageEvent = ( EntityDamageByEntityEvent  )event;
 						
@@ -79,7 +80,7 @@ public class FAEntityListener
 							  damageEvent.getEntity( ) instanceof Player )
 						{
 							Player attacker = ( Player )damageEvent.getDamager( );
-							if (attacker.getInventory().getSize() == 0) {
+							if (specHandler.isAnObserver(attacker)) {
 								event.setDamage(0);
 								return;
 							}

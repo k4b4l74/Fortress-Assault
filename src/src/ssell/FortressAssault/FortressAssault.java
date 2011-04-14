@@ -46,6 +46,7 @@ import ssell.FortressAssault.Utils.Volume;
  * http://www.1143pm.com/
  * 
  * @author Steven Sell
+ * @contributor Wulfy, K4b4l
  */
 public class FortressAssault extends JavaPlugin
 {

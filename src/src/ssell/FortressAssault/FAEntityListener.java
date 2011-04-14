@@ -1,26 +1,21 @@
 package ssell.FortressAssault;
 
-import net.minecraft.server.EntityTNTPrimed;
-import net.minecraft.server.World;
-
-import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.entity.Arrow;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
-import org.bukkit.event.entity.EntityDamageByBlockEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
-import org.bukkit.event.entity.EntityDamageByProjectileEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.EntityListener;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.util.Vector;
 
 import ssell.FortressAssault.FortressAssault;
 import ssell.FortressAssault.FAPvPWatcher;
 import ssell.FortressAssault.FortressAssault.ClassType;
 import ssell.FortressAssault.FortressAssault.FAPlayer;
+import ssell.FortressAssault.item.EggGrenade;
+import ssell.FortressAssault.item.SnowBallSnare;
+import ssell.FortressAssault.item.SuperBow;
 
 //------------------------------------------------------------------------------------------
 
@@ -66,17 +61,14 @@ public class FAEntityListener
 					return;
 				}
 				else if( plugin.phase == 2 ) {
+					//GRENADE DMG MODIFIER
+					EggGrenade.getInstance(plugin).onEntityDamage(event, player);
 					
-					if (event instanceof EntityDamageByBlockEvent) {
-						EntityDamageByBlockEvent damageEvent = (EntityDamageByBlockEvent) event;
-						if (damageEvent.getDamager().getType() == Material.TNT) {
-							event.setDamage(10);
-						}
-					}
+					//SNARE IF SNOWBALL
+					SnowBallSnare.getInstance(plugin).onEntityDamage(event, player);
 					
-					if(event instanceof EntityDamageByProjectileEvent && event.getDamage() >= 1){
-		        		event.setDamage(event.getDamage() * 2);
-		        	}
+					//BOW DMG MODIFIER
+					SuperBow.getInstance().onEntityDamage(event, player);
 					
 					//NO DMG IF PLAYER IS AN OBSERVER
 					if( event instanceof EntityDamageByEntityEvent ) {
@@ -122,67 +114,6 @@ public class FAEntityListener
 
 					}
 					
-					//LLY
-					//trigger on damage from projectile (as arrow)
-					if( event instanceof EntityDamageByProjectileEvent )
-					{
-						EntityDamageByProjectileEvent damageEvent = ( EntityDamageByProjectileEvent  )event;
-						
-						//if damager is a player AND projectile is an arrow
-						if(damageEvent.getDamager( ) instanceof Player && 
-								damageEvent.getProjectile() instanceof Arrow)
-						{
-							Player attacker = ( Player )damageEvent.getDamager( );
-					
-							//FIRE
-							if(attacker.getInventory().contains(Material.LAVA_BUCKET ) || 
-									attacker.getInventory().contains(Material.LAVA))
-							{
-								
-								player.setFireTicks(60);
-								
-								if(attacker.getInventory().contains(Material.LAVA_BUCKET ))
-									attacker.getInventory().remove(Material.LAVA_BUCKET);
-								else
-									attacker.getInventory().remove(Material.LAVA);
-							}
-							//SNARE
-							else if(attacker.getInventory().contains(Material.ICE))
-							{
-								attacker.getInventory().remove(Material.ICE);
-								Vector speed = player.getVelocity();
-								if(speed == plugin.getPlayersSpeed())
-								{
-									Vector newspeed = speed.multiply(0.5);
-									player.setVelocity(newspeed);
-								}
-							}
-							//GRAB
-							else if(attacker.getInventory().contains(Material.YELLOW_FLOWER))
-							{
-								attacker.getInventory().remove(Material.YELLOW_FLOWER);
-								Location attackerLoc = attacker.getLocation();
-								//prevent fusion :)
-								attackerLoc.setX(attackerLoc.getX()+2);
-								player.teleport(attackerLoc);
-								FortressAssault.lastSnareEvent = System.currentTimeMillis();
-							}
-							//explode
-							else if(attacker.getInventory().contains(Material.TNT))
-							{
-								World world	=	(World) attacker.getWorld();
-								Location loc = attacker.getLocation();
-								EntityTNTPrimed tnt = new EntityTNTPrimed((net.minecraft.server.World) world, loc.getX(), loc.getY(), loc.getZ());
-						    	//world.a(tnt);
-								float realYield = (float) 2.0;
-								world.a(tnt, loc.getX(), loc.getY(), loc.getZ(), realYield);
-						   
-							}
-						}
-						
-					}
-					
-
 					if( event instanceof EntityDamageByEntityEvent )
 					{
 						EntityDamageByEntityEvent damageEvent = ( EntityDamageByEntityEvent  )event;

@@ -23,6 +23,8 @@ import org.bukkit.util.Vector;
 
 import ssell.FortressAssault.FortressAssault.ClassType;
 import ssell.FortressAssault.FortressAssault.FAPlayer;
+import ssell.FortressAssault.item.EggGrenade;
+import ssell.FortressAssault.item.SnowBallSnare;
 
 @SuppressWarnings("unused")
 public class FAPlayerListener 
@@ -46,11 +48,8 @@ public class FAPlayerListener
 		if (thisPlayer == null) {	
 			return;
 		}
-		
-    	Egg egg = event.getEgg();
-    	Location loc = egg.getLocation();
-    	World world = ((CraftWorld)loc.getWorld()).getHandle();
-    	plugin.eggThrown(loc, player, world, egg, event);
+		//Launch the grenade
+    	EggGrenade.getInstance(plugin).onPlayerEggThrow(event);
 	}
 	
 	public void onPlayerMove(PlayerMoveEvent event) {
@@ -80,16 +79,8 @@ public class FAPlayerListener
 			 */
 		}
 		
-		//LLy
-		//player is snared , lets check for how long
-		if(!player.getVelocity().equals(plugin.getPlayersSpeed()))
-		{
-			//reset player speed if snared for more than 2sec
-			if(System.currentTimeMillis() > (FortressAssault.lastSnareEvent+2000))
-			{
-				player.setVelocity(plugin.getPlayersSpeed());
-			}
-		}
+		//Check unfreeze
+		SnowBallSnare.getInstance(plugin).onPlayerMove(event);
 	}
 	public void onPlayerDropItem(PlayerDropItemEvent event) {
 		Player player = event.getPlayer( );

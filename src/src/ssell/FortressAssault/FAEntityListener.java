@@ -3,10 +3,12 @@ package ssell.FortressAssault;
 import org.bukkit.Material;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
+import org.bukkit.event.entity.EntityDamageByBlockEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageByProjectileEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
+import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.event.entity.EntityListener;
 import org.bukkit.inventory.ItemStack;
 
@@ -58,9 +60,33 @@ public class FAEntityListener
 				}
 				else if( plugin.phase == 2 ) {
 					
+					if (event instanceof EntityDamageByBlockEvent) {
+						EntityDamageByBlockEvent damageEvent = (EntityDamageByBlockEvent) event;
+						if (damageEvent.getDamager().getType() == Material.TNT) {
+							event.setDamage(10);
+						}
+					}
+					
 					if(event instanceof EntityDamageByProjectileEvent && event.getDamage() >= 1){
 		        		event.setDamage(event.getDamage() * 2);
 		        	}
+					
+					//NO DMG IF PLAYER SPEC WITH 0 INVENTORY
+					if( event instanceof EntityDamageByEntityEvent ) {
+						EntityDamageByEntityEvent damageEvent = ( EntityDamageByEntityEvent  )event;
+						
+						if( ( damageEvent.getDamager( ) instanceof Player ) &&
+							  damageEvent.getEntity( ) instanceof Player )
+						{
+							Player attacker = ( Player )damageEvent.getDamager( );
+							if (attacker.getInventory().getSize() == 0) {
+								event.setDamage(0);
+								return;
+							}
+						}
+					}
+					
+					
 		        	
 					int damage = event.getDamage();
 					int oldHealth = player.getHealth( );

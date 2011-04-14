@@ -9,7 +9,10 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import net.minecraft.server.EntityTNTPrimed;
+
 import org.bukkit.ChatColor;
+import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
@@ -17,6 +20,7 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.craftbukkit.CraftWorld;
 import org.bukkit.craftbukkit.entity.CraftPlayer;
+import org.bukkit.entity.Egg;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
@@ -92,6 +96,7 @@ public class FortressAssault extends JavaPlugin
 	//The order of these is critical
 	private final FAGizmoHandler gizmoHandler = new FAGizmoHandler( this, 2 );
 	private final FARespawnHandler respawnHandler = new FARespawnHandler(this);
+	private final FASpecHandler specHandler = new FASpecHandler();
 	private final FABlockListener blockListener = new FABlockListener( this, gizmoHandler, respawnHandler);
 	private final FAPvPWatcher pvpWatcher = new FAPvPWatcher( this );
 	private final FAClassAbilities classAbilities = new FAClassAbilities( this );
@@ -139,10 +144,12 @@ public class FortressAssault extends JavaPlugin
 		PluginManager pluginMgr = getServer( ).getPluginManager( );
 		
 		//Register for events
+		pluginMgr.registerEvent( Event.Type.BLOCK_BREAK, blockListener, 
+				                 Event.Priority.High, this );
 		pluginMgr.registerEvent( Event.Type.BLOCK_DAMAGE, blockListener, 
 				                 Event.Priority.High, this );
 		pluginMgr.registerEvent( Event.Type.BLOCK_PLACE, blockListener,
-				                 Event.Priority.Normal, this );
+				                 Event.Priority.Normal, this );	
 		pluginMgr.registerEvent( Event.Type.ENTITY_DAMAGE, entityListener,
 								 Event.Priority.Normal, this );
 		pluginMgr.registerEvent( Event.Type.ENTITY_DEATH, entityListener,
@@ -157,6 +164,8 @@ public class FortressAssault extends JavaPlugin
 				 				 Event.Priority.Normal, this );
 		pluginMgr.registerEvent( Event.Type.PLAYER_MOVE, playerListener,
 				 				 Event.Priority.Normal, this );
+		pluginMgr.registerEvent( Event.Type.PLAYER_EGG_THROW, playerListener, 
+									Event.Priority.Low, this);
 		
 		log.info( "Fortress Assault v1.2.3 is enabled!" );		
 	}
@@ -178,7 +187,11 @@ public class FortressAssault extends JavaPlugin
 				if( commandName.equalsIgnoreCase("fastart" ) )
 				{
 					if (canStart(player)) {
-						startEvent( ( Player )sender );
+						if (specHandler.location == null) {
+							player.sendMessage(ChatColor.RED + "You need to specify a observer spawn");
+						} else {
+							startEvent( ( Player )sender );
+						}
 					} else {
 						player.sendMessage(ChatColor.RED + "You don't have permission to start the game.");
 					}
@@ -194,6 +207,11 @@ public class FortressAssault extends JavaPlugin
 					}
 					
 					return true;
+				}
+				else if( commandName.equalsIgnoreCase( "faspec" ) )
+				{
+					specHandler.location = player.getLocation();
+					player.sendMessage(ChatColor.GREEN + "Observer Spawn has been set !");
 				}
 				else if( commandName.equalsIgnoreCase( "faadd" ) )
 				{
@@ -251,8 +269,8 @@ public class FortressAssault extends JavaPlugin
 					if (canSaveMap(player)) {
 						if (phase == 0) {
 							Block playerBlock = player.getLocation().getBlock();
-							Block one = player.getWorld().getBlockAt(playerBlock.getX()+50, playerBlock.getY()+20, playerBlock.getZ()+50);
-							Block two = player.getWorld().getBlockAt(playerBlock.getX()-50, playerBlock.getY()-20, playerBlock.getZ()-50);
+							Block one = player.getWorld().getBlockAt(playerBlock.getX()+50, playerBlock.getY()+30, playerBlock.getZ()+50);
+							Block two = player.getWorld().getBlockAt(playerBlock.getX()-50, playerBlock.getY()-30, playerBlock.getZ()-50);
 							volume = new Volume("arena",this,player.getWorld());
 							volume.setCornerOne(one);
 							volume.setCornerTwo(two);
@@ -768,7 +786,7 @@ public class FortressAssault extends JavaPlugin
 		
 			player.getInventory( ).addItem( new ItemStack( Material.OBSIDIAN, 1 ) );
 			player.getInventory( ).addItem( new ItemStack( Material.IRON_PICKAXE, 1 ) );
-			player.getInventory( ).addItem( new ItemStack( Material.STONE, ( resources * 32 ) ) );
+			player.getInventory( ).addItem( new ItemStack( Material.BRICK, ( resources * 32 ) ) );
 			
 			break;
 		//attack phase
@@ -789,15 +807,13 @@ public class FortressAssault extends JavaPlugin
 			
 			// Stone Sword instead of Iron
 			player.getInventory( ).addItem( new ItemStack( Material.STONE_SWORD, 1 ) );
-			player.getInventory( ).addItem( new ItemStack( Material.STONE_PICKAXE, 1 ) );
+			player.getInventory( ).addItem( new ItemStack( Material.IRON_PICKAXE, 1 ) );
 			
 
-			player.getInventory( ).addItem( new ItemStack( Material.TNT, 1 ) );
-			// Add bow + arrow
+			player.getInventory( ).addItem( new ItemStack( Material.EGG, resources * 1 ) );
 			player.getInventory( ).addItem( new ItemStack( Material.BOW, 1 ) );
-			player.getInventory( ).addItem( new ItemStack( Material.ARROW, 10 ) );
+			player.getInventory( ).addItem( new ItemStack( Material.ARROW, resources * 5 ) );
 			player.getInventory( ).addItem( new ItemStack( Material.LADDER, 6 ) );
-			player.getInventory( ).addItem( new ItemStack( Material.MUSHROOM_SOUP, 1 ) );
 			player.getInventory( ).addItem( new ItemStack( Material.COOKED_FISH, 1 ) );
 			player.getInventory( ).addItem( new ItemStack( Material.BREAD, 1 ) );
 			break;
@@ -906,6 +922,10 @@ public class FortressAssault extends JavaPlugin
 		return inventories.containsKey(playerName);
 	}
 
+	public Location getSpecLocation() {
+		return specHandler.location;
+	}
+	
 	public void keepPlayerInventory(Player player) {
 		//make sure entity is correct
 		player = getServer().getPlayer(ChatColor.stripColor(player.getDisplayName()));
@@ -1001,6 +1021,18 @@ public class FortressAssault extends JavaPlugin
 		if(originalContents.getFeet() != null && originalContents.getFeet().getType() != Material.AIR) {
 			playerInv.setBoots(originalContents.getFeet());
 		}
+	}
+	
+	public void eggThrown(final Location loc, Player player, final net.minecraft.server.World world, Egg egg, Event event){
+		long actualDelayTime = 20;
+		this.getServer().getScheduler().scheduleSyncDelayedTask(this, new Runnable() {
+			    public void run() {
+			    	EntityTNTPrimed tnt = new EntityTNTPrimed((net.minecraft.server.World) world, loc.getX(), loc.getY(), loc.getZ());
+			    	//world.a(tnt);
+					float realYield = (float) 2.0;
+					world.a(tnt, loc.getX(), loc.getY(), loc.getZ(), realYield);
+			    }
+			}, actualDelayTime);
 	}
 
 	public InventoryStash getPlayerInventory(String playerName) {

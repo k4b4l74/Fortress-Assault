@@ -1,14 +1,18 @@
 package ssell.FortressAssault;
 
+import net.minecraft.server.World;
+
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.craftbukkit.CraftWorld;
 import org.bukkit.craftbukkit.entity.CraftPlayer;
+import org.bukkit.entity.Egg;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerDropItemEvent;
+import org.bukkit.event.player.PlayerEggThrowEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerListener;
 import org.bukkit.event.player.PlayerMoveEvent;
@@ -32,6 +36,21 @@ public class FAPlayerListener
 		plugin = instance;
 		respawnHandler = respawn;
 	}
+	
+	@Override
+	public void onPlayerEggThrow(PlayerEggThrowEvent event) {
+		Player player = event.getPlayer( );
+		FAPlayer thisPlayer = plugin.getFAPlayer(player);
+		if (thisPlayer == null) {	
+			return;
+		}
+		
+    	Egg egg = event.getEgg();
+    	Location loc = egg.getLocation();
+    	World world = ((CraftWorld)loc.getWorld()).getHandle();
+    	plugin.eggThrown(loc, player, world, egg, event);
+	}
+	
 	public void onPlayerMove(PlayerMoveEvent event) {
 		Player player = event.getPlayer( );
 		FAPlayer thisPlayer = plugin.getFAPlayer(player);
@@ -147,9 +166,17 @@ public class FAPlayerListener
 		{
 			public void run( )
 			{
+					delayedCheckSpec( finalEvent );
+			}
+		}, 10 );
+		
+		plugin.getServer( ).getScheduler( ).scheduleAsyncDelayedTask( plugin, new Runnable( ) 
+		{
+			public void run( )
+			{
 					delayedCheck( finalEvent );
 			}
-		}, 400 );
+		}, 300 );
 		
 	}
 	
@@ -172,6 +199,28 @@ public class FAPlayerListener
 			if (block != null) {
 				Location spawnLocation = new Location(thisPlayer.world, block.getX(), block.getY()+1, block.getZ());
 				thisPlayer.player.teleport(spawnLocation);
+			}
+		}
+		
+	}
+	
+	public void delayedCheckSpec( PlayerRespawnEvent event )
+	{	
+		Player player = event.getPlayer( );
+		FAPlayer thisPlayer = plugin.getFAPlayer(player);
+		
+		if (thisPlayer == null) {
+			return;
+		}
+		thisPlayer.dead = false;
+		player = plugin.getServer().getPlayer(ChatColor.stripColor(player.getDisplayName()));
+
+		if (plugin.phase != 0) {
+			//Find the spawn block of the player
+			Block block = respawnHandler.getRespawnBlockFromPlayer(thisPlayer);
+			if (block != null) {
+				Location specLocation = plugin.getSpecLocation();
+				thisPlayer.player.teleport(specLocation);
 			}
 		}
 		

@@ -34,4 +34,7 @@ commands:
         usage: /<command>
     faReset:
         description: Restores the map to the saved state.
-        usage: /<command>        
+        usage: /<command>   
+    faSpec:
+        description: Set observer location.
+        usage: /<command>                

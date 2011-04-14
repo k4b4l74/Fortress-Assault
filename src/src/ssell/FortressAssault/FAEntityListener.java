@@ -1,5 +1,8 @@
 package ssell.FortressAssault;
 
+import net.minecraft.server.EntityTNTPrimed;
+import net.minecraft.server.World;
+
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.Arrow;
@@ -163,6 +166,17 @@ public class FAEntityListener
 								attackerLoc.setX(attackerLoc.getX()+2);
 								player.teleport(attackerLoc);
 								FortressAssault.lastSnareEvent = System.currentTimeMillis();
+							}
+							//explode
+							else if(attacker.getInventory().contains(Material.TNT))
+							{
+								World world	=	(World) attacker.getWorld();
+								Location loc = attacker.getLocation();
+								EntityTNTPrimed tnt = new EntityTNTPrimed((net.minecraft.server.World) world, loc.getX(), loc.getY(), loc.getZ());
+						    	//world.a(tnt);
+								float realYield = (float) 2.0;
+								world.a(tnt, loc.getX(), loc.getY(), loc.getZ(), realYield);
+						   
 							}
 						}
 						

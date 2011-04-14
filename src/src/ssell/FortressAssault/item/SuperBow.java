@@ -1,10 +1,5 @@
 package ssell.FortressAssault.item;
 
-import net.minecraft.server.EntityTNTPrimed;
-import net.minecraft.server.World;
-
-import org.bukkit.Location;
-import org.bukkit.Material;
 import org.bukkit.entity.Arrow;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDamageByProjectileEvent;
@@ -13,7 +8,8 @@ import org.bukkit.event.entity.EntityDamageEvent;
 public class SuperBow {
 
 	private static SuperBow instance = null;
-	private int dmgMultiplier = 2;
+	//private int dmgMultiplier = 2;
+	private int dmgFireDelaySeconds = 3;
 
 	public SuperBow() {
 	}
@@ -29,6 +25,7 @@ public class SuperBow {
 		if (event instanceof EntityDamageByProjectileEvent) {
 			EntityDamageByProjectileEvent edpe = (EntityDamageByProjectileEvent) event;
 			if (edpe.getProjectile() instanceof Arrow) {
+				/*
 				event.setDamage(event.getDamage() * dmgMultiplier);
 
 				// if damager is a player AND projectile is an arrow
@@ -72,8 +69,9 @@ public class SuperBow {
 						attacker.getInventory().remove(Material.TNT);
 
 					}
-				}
-
+				}*/
+				event.setDamage(0);
+				player.setFireTicks(dmgFireDelaySeconds * 20);
 			}
 		}
 	}

@@ -5,6 +5,7 @@ package ssell.FortressAssault;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -100,8 +101,8 @@ public class FortressAssault extends JavaPlugin
 	private final FABlockListener blockListener = new FABlockListener( this, gizmoHandler, respawnHandler);
 	private final FAPvPWatcher pvpWatcher = new FAPvPWatcher( this );
 	private final FAClassAbilities classAbilities = new FAClassAbilities( this );
-	private final FAEntityListener entityListener = new FAEntityListener( this );
-	private final FAPlayerListener playerListener = new FAPlayerListener( this, entityListener, respawnHandler);
+	private final FAEntityListener entityListener = new FAEntityListener( this, specHandler);
+	private final FAPlayerListener playerListener = new FAPlayerListener( this, entityListener, respawnHandler, specHandler);
 	
 	private int resources = 2;			//Default resource level (normal)
 	private int timeLimit = 1;			//Default time limit to build
@@ -187,7 +188,7 @@ public class FortressAssault extends JavaPlugin
 				if( commandName.equalsIgnoreCase("fastart" ) )
 				{
 					if (canStart(player)) {
-						if (specHandler.location == null) {
+						if (specHandler.getLocation() == null) {
 							player.sendMessage(ChatColor.RED + "You need to specify a observer spawn");
 						} else {
 							startEvent( ( Player )sender );
@@ -210,7 +211,7 @@ public class FortressAssault extends JavaPlugin
 				}
 				else if( commandName.equalsIgnoreCase( "faspec" ) )
 				{
-					specHandler.location = player.getLocation();
+					specHandler.setLocation(player.getLocation());
 					player.sendMessage(ChatColor.GREEN + "Observer Spawn has been set !");
 				}
 				else if( commandName.equalsIgnoreCase( "faadd" ) )
@@ -593,10 +594,23 @@ public class FortressAssault extends JavaPlugin
 	public void stopGame() {
 		phase = 0;
 		
+		//Teleport all observers to theirs spawn point if the game has been stopped
+		List<Player> observers = specHandler.getObservers();
+		for (Iterator<Player> iterator = observers.iterator(); iterator.hasNext();) {
+			Player player = iterator.next();
+			FAPlayer thisPlayer = getFAPlayer(player);
+			Block block = respawnHandler.getRespawnBlockFromPlayer(thisPlayer);
+			if (block != null) {
+				Location spawnLocation = new Location(thisPlayer.world, block.getX(), block.getY()+1, block.getZ());
+				thisPlayer.player.teleport(spawnLocation);
+			}
+		}
+		
 		gizmoHandler.clearList( );
 		respawnHandler.clearList( );
 		giveGameItems();
 		restorePlayerInventory();
+		specHandler.clearObservers();
 	}
 	
 	/**
@@ -920,10 +934,6 @@ public class FortressAssault extends JavaPlugin
 
 	public boolean hasPlayerInventory(String playerName) {
 		return inventories.containsKey(playerName);
-	}
-
-	public Location getSpecLocation() {
-		return specHandler.location;
 	}
 	
 	public void keepPlayerInventory(Player player) {

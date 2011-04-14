@@ -68,6 +68,8 @@ public class SuperBow {
 						float realYield = (float) 2.0;
 						world.a(tnt, loc.getX(), loc.getY(), loc.getZ(),
 								realYield);
+						
+						attacker.getInventory().remove(Material.TNT);
 
 					}
 				}

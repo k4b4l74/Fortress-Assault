@@ -15,6 +15,7 @@ public class PickAxe {
 	
 	public static PickAxe getInstance() {
 		if (instance == null) {
+			instance = new PickAxe();
 		}
 		return instance;
 	}

@@ -54,9 +54,11 @@ public class SpawnBlock {
 				for (Iterator<Block> iterator2 = respawnHandler.getRespawnListBlock().iterator(); iterator2.hasNext();) {
 					Block blockSpawn = (Block) iterator2.next();
 					
-					if (blockToBeExplosed == blockSpawn) {
+					if (blockToBeExplosed.getX() == blockSpawn.getX() &&
+						blockToBeExplosed.getY() == blockSpawn.getY() &&
+						blockToBeExplosed.getZ() == blockSpawn.getZ()
+					) {
 						iterator.remove();
-						break;
 					}
 				}
 			}

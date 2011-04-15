@@ -99,7 +99,7 @@ public class FortressAssault extends JavaPlugin
 	private final FABlockListener blockListener = new FABlockListener( this, gizmoHandler, respawnHandler);
 	private final FAPvPWatcher pvpWatcher = new FAPvPWatcher( this );
 	private final FAClassAbilities classAbilities = new FAClassAbilities( this );
-	private final FAEntityListener entityListener = new FAEntityListener( this, specHandler);
+	private final FAEntityListener entityListener = new FAEntityListener( this, specHandler, respawnHandler);
 	private final FAPlayerListener playerListener = new FAPlayerListener( this, entityListener, respawnHandler, specHandler);
 	
 	private int resources = 2;			//Default resource level (normal)

@@ -6,6 +6,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
+import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.event.entity.EntityListener;
 import org.bukkit.inventory.ItemStack;
 
@@ -13,6 +14,7 @@ import ssell.FortressAssault.FortressAssault;
 import ssell.FortressAssault.FAPvPWatcher;
 import ssell.FortressAssault.FortressAssault.ClassType;
 import ssell.FortressAssault.FortressAssault.FAPlayer;
+import ssell.FortressAssault.block.SpawnBlock;
 import ssell.FortressAssault.item.EggGrenade;
 import ssell.FortressAssault.item.PickAxe;
 import ssell.FortressAssault.item.SnowBallSnare;
@@ -26,14 +28,27 @@ public class FAEntityListener
 	private final FortressAssault plugin;
 	private final FAPvPWatcher pvpWatcher;
 	private final FASpecHandler specHandler;
+	private final FARespawnHandler respawnHandler;
 		
 	//--------------------------------------------------------------------------------------
 	
-	public FAEntityListener( FortressAssault instance, FASpecHandler aSpecHandler)
+	public FAEntityListener( FortressAssault instance, FASpecHandler aSpecHandler, FARespawnHandler aRespawnHandler)
 	{
 		plugin = instance;
 		pvpWatcher = instance.getWatcher( );
 		specHandler = aSpecHandler;
+		respawnHandler = aRespawnHandler;
+	}
+
+	/**
+	 * When TNT Explode
+	 */
+	public void onEntityExplode(EntityExplodeEvent event) {
+		if (plugin.phase == 2) {
+			//PREVENT SPAWN BLOCK TO BE "TNTed"
+			SpawnBlock.getInstance(respawnHandler).onEntityExplode(event);
+		}
+		
 	}
 	
 	/**
@@ -45,7 +60,6 @@ public class FAEntityListener
 	@Override 
 	public void onEntityDamage( EntityDamageEvent event )
 	{
-		super.onEntityDamage(event);
 		Entity entity = event.getEntity( );
 		if( entity instanceof Player )
 		{

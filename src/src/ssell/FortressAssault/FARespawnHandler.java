@@ -29,6 +29,15 @@ public class FARespawnHandler {
 		plugin = instance;
 	}
 	
+	public List<Block> getRespawnListBlock() {
+		List<Block> blockList = new ArrayList<Block>();
+		for( int i = 0; i < respawnList.size( ); i++ )
+		{
+			blockList.add(respawnList.get(i).block);
+		}
+		return blockList;
+	}
+	
 	public void addSpawnBlock( FAPlayer thisPlayer, Block block )
 	{		
 		FARespawn respawn = new FARespawn(thisPlayer, block );

@@ -107,9 +107,6 @@ public class FortressAssault extends JavaPlugin
 	private Volume volume;
 	private boolean mapsaved = false;
 	
-
-	private boolean friendlyFire = true; //default friendly fire state
-	
 	public List< FAPlayer > playerList = new ArrayList< FAPlayer >( );
 	private HashMap<String, InventoryStash> inventories = new HashMap<String, InventoryStash>();
 	
@@ -213,8 +210,12 @@ public class FortressAssault extends JavaPlugin
 				}
 				else if( commandName.equalsIgnoreCase( "faspec" ) )
 				{
-					specHandler.setLocation(player.getLocation());
-					player.sendMessage(ChatColor.GREEN + "Observer Spawn has been set !");
+					if (canSpec(player)) {
+						specHandler.setLocation(player.getLocation());
+						player.sendMessage(ChatColor.GREEN + "Spectator Spawn has been set !");
+					} else {
+						player.sendMessage(ChatColor.RED + "You don't have permission to set the spectator respawn point");
+					}
 				}
 				else if( commandName.equalsIgnoreCase( "faadd" ) )
 				{
@@ -302,8 +303,7 @@ public class FortressAssault extends JavaPlugin
 						}
 					} else {
 						player.sendMessage(ChatColor.RED + "You don't have permission to reset the map.");
-					}
-									
+					}					
 				}
 				else if( commandName.equalsIgnoreCase( "faclass" ) )
 				{							
@@ -328,15 +328,13 @@ public class FortressAssault extends JavaPlugin
 						player.sendMessage(ChatColor.RED + "You don't have permission to change classes.");
 					}
 									
+				} else if (commandName.equalsIgnoreCase("faresetteam")) {
+					if (canResetTeam(player)) {
+						playerList = new ArrayList<FortressAssault.FAPlayer>();
+					} else {
+						player.sendMessage(ChatColor.RED + "You don't have permission to set the spectator respawn point");
+					}
 				}
-				//Change friendly fire
-				else if( commandName.equalsIgnoreCase( "faff" )	)
-				{
-					if (canStart(player))
-						friendlyFire = args[0].equalsIgnoreCase("on");
-					else
-						player.sendMessage(ChatColor.RED + "You don't have permission to change friendly fire.");
-				}		
 			}
 	    }
 		return false;
@@ -1043,8 +1041,6 @@ public class FortressAssault extends JavaPlugin
 			playerInv.setBoots(originalContents.getFeet());
 		}
 	}
-	
-
 
 	public InventoryStash getPlayerInventory(String playerName) {
 		if(inventories.containsKey(playerName)) return inventories.get(playerName);
@@ -1130,6 +1126,18 @@ public class FortressAssault extends JavaPlugin
 		return false;
 	}
 	@SuppressWarnings("static-access")
+	public boolean canSpec(Player player) {
+		if(Permissions != null 
+				&& (Permissions.Security.permission(player, "fa.spec")
+						|| Permissions.Security.permission(player, "FA.spec"))) {
+			return true;
+		}
+		if(Permissions == null) {
+			return true;
+		}
+		return false;
+	}	
+	@SuppressWarnings("static-access")
 	public boolean canChangeClass(Player player) {
 		if(Permissions != null 
 				&& (Permissions.Security.permission(player, "fa.class")
@@ -1144,9 +1152,19 @@ public class FortressAssault extends JavaPlugin
 		}
 		return false;
 	}
-	
-	
-	public boolean getFriendlyFire(){
-		return friendlyFire;
+	@SuppressWarnings("static-access")
+	public boolean canResetTeam(Player player) {
+		if(Permissions != null 
+				&& (Permissions.Security.permission(player, "fa.resetTeam")
+						|| Permissions.Security.permission(player, "FA.resetTeam"))) {
+			return true;
+		}
+		if(Permissions == null) {
+			if (player.isOp()) {
+				return true;
+			}
+			return false;
+		}
+		return false;
 	}
 }

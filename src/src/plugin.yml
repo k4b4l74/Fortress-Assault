@@ -37,4 +37,7 @@ commands:
         usage: /<command>   
     faSpec:
         description: Set observer location.
-        usage: /<command>                
+        usage: /<command>        
+    faResetTeam:
+    	description: Remove all players from the game
+    	usage: /<command>        
